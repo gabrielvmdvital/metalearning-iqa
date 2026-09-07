@@ -1,0 +1,11 @@
+numpy
+openpyxl
+pandas
+pyiqa
+scikit-image
+scikit-learn
+scikit-posthocs
+scipy
+torch
+torchvision
+tqdm
