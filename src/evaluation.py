@@ -6,7 +6,7 @@ from PIL import Image
 import torchvision.transforms.functional as TF
 from scipy.stats import spearmanr
 from tqdm import tqdm
-from msa_iqa import MSAIQA
+from src.msa_iqa import MSAIQA
 import torchvision.transforms as T
 
 def load_image_tensor(path, max_dim=512):
