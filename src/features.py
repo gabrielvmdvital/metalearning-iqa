@@ -111,23 +111,23 @@ def build_meta_features_matrix(df_metadata, extended=True):
         if not extended:
             img_feats = {k: v for k, v in img_feats.items() if k in base_keys}
             
-        all_means = [np.mean(img_feats[k]) for k in img_feats]
-        all_stds = [np.std(img_feats[k]) for k in img_feats]
-        all_skews = [skew(img_feats[k]) for k in img_feats]
-        all_kurts = [kurtosis(img_feats[k]) for k in img_feats]
+        all_means = [np.mean(img_feats[k]) for k in img_feats] if img_feats else [np.nan]
+        all_stds = [np.std(img_feats[k]) for k in img_feats] if img_feats else [np.nan]
+        all_skews = [skew(img_feats[k]) for k in img_feats] if img_feats else [np.nan]
+        all_kurts = [kurtosis(img_feats[k]) for k in img_feats] if img_feats else [np.nan]
         
         ds_features['MeanMeansOfNumericAtts'] = np.mean(all_means)
         ds_features['MeanStdDevOfNumericAtts'] = np.mean(all_stds)
         ds_features['MeanSkewnessOfNumericAtts'] = np.mean(all_skews)
         ds_features['MeanKurtosisOfNumericAtts'] = np.mean(all_kurts)
         
-        ds_features['MeanAttributeEntropy'] = np.mean(img_feats['entropia'])
+        ds_features['MeanAttributeEntropy'] = np.mean(img_feats.get('entropia', [np.nan]))
         
-        mean_snr = np.mean(img_feats['snr'])
+        mean_snr = np.mean(img_feats.get('snr', [np.nan]))
         ds_features['NoiseToSignalRatio'] = 1.0 / mean_snr if mean_snr > 0 else 0.0
         
-        ds_features['IQA_MeanBrightness'] = np.mean(img_feats['brilho'])
-        ds_features['IQA_MeanContrast'] = np.mean(img_feats['contraste'])
+        ds_features['IQA_MeanBrightness'] = np.mean(img_feats.get('brilho', [np.nan]))
+        ds_features['IQA_MeanContrast'] = np.mean(img_feats.get('contraste', [np.nan]))
         
         if extended:
             ds_features['IQA_MeanColorfulness'] = np.mean(img_feats['colorfulness'])
