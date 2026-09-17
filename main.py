@@ -41,14 +41,32 @@ def main():
     P_matrix = df_P_folds.groupby('dataset')[list(metrics.keys())].mean()
     
     print("=== Passo 2: Construindo Matriz X (Base e Estendida) ===")
-    df_X_base = build_meta_features_matrix(df_metadata, extended=False)
-    df_X_base = df_X_base.sort_values('dataset').reset_index(drop=True)
-    df_X_base.to_csv(data_processed_dir / 'X_matrix_base.csv', index=False)
+    
+    # Carregar matriz Base se existir para economizar tempo
+    x_base_path = data_processed_dir / 'X_matrix_base.csv'
+    x_old_path = data_processed_dir / 'X_matrix.csv'
+    
+    if x_base_path.exists():
+        df_X_base = pd.read_csv(x_base_path)
+    elif x_old_path.exists():
+        df_X_base = pd.read_csv(x_old_path)
+        df_X_base.to_csv(x_base_path, index=False)
+    else:
+        df_X_base = build_meta_features_matrix(df_metadata, extended=False)
+        df_X_base = df_X_base.sort_values('dataset').reset_index(drop=True)
+        df_X_base.to_csv(x_base_path, index=False)
+        
     X_matrix_base = df_X_base.drop('dataset', axis=1)
 
-    df_X_estendida = build_meta_features_matrix(df_metadata, extended=True)
-    df_X_estendida = df_X_estendida.sort_values('dataset').reset_index(drop=True)
-    df_X_estendida.to_csv(data_processed_dir / 'X_matrix_estendida.csv', index=False)
+    # Carregar matriz Estendida se existir para economizar tempo
+    x_ext_path = data_processed_dir / 'X_matrix_estendida.csv'
+    if x_ext_path.exists():
+        df_X_estendida = pd.read_csv(x_ext_path)
+    else:
+        df_X_estendida = build_meta_features_matrix(df_metadata, extended=True)
+        df_X_estendida = df_X_estendida.sort_values('dataset').reset_index(drop=True)
+        df_X_estendida.to_csv(x_ext_path, index=False)
+        
     X_matrix_estendida = df_X_estendida.drop('dataset', axis=1)
     
     print("=== Passo 3: Construindo Matriz R ===")
