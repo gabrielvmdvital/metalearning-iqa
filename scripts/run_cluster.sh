@@ -9,7 +9,7 @@
 #SBATCH --output=job_output_metalearning.txt
 #SBATCH --error=job_error_metalearning.txt
 
-cd $HOME/metalearning/projeto
+cd $HOME/metalearning/metalearning-iqa
 
 source .venv/bin/activate
 

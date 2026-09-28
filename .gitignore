@@ -2,10 +2,12 @@
 __pycache__/
 *.py[codz]
 *$py.class
-
+data/raw/*
+data/zips/*
 # C extensions
 *.so
-
+job_error_metalearning.txt
+job_output_metalearning.txt
 # Distribution / packaging
 .Python
 build/
