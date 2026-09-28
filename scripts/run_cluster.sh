@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=metalearning_iqa
 #SBATCH -p short-complex
-#SBATCH --nodelist=cluster-node9
+#SBATCH --nodelist=cluster-node6
 #SBATCH --gpus=1
 #SBATCH --mem=64G
 #SBATCH -c 16
