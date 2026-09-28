@@ -79,7 +79,9 @@ def main():
         'MR': BaselineRanker(method='MR'),
         'Abordagem1 (P)': MetaRegressor(target='P'),
         'Abordagem2 (R)': MetaRegressor(target='R'),
+        'HARRIS (L=0.0)': HarrisForest(lambd=0.0),
         'HARRIS (L=0.5)': HarrisForest(lambd=0.5),
+        'HARRIS (L=1.0)': HarrisForest(lambd=1.0),
     }
     
     print("\n=== Passo 5: Avaliação Leave-One-Dataset-Out (BASE) ===")
@@ -90,15 +92,37 @@ def main():
     
     print("\n=== Passo 6: Gerando Gráficos Comparativos ===")
     
+    # Extrair e salvar os dados numéricos da curva de perda
+    loss_curves_data = []
+    
     # Loss curves comparison
     plt.figure(figsize=(12, 8))
     for name, res in results_base.items():
         if name not in ['AR', 'MR']:
+            # Armazena para CSV
+            loss_curves_data.append({
+                'Abordagem': f"{name} (BASE)",
+                'AUC': res['Mean_AUC'],
+                **{f't={i+1}': val for i, val in enumerate(res['Mean_Curve'])}
+            })
+            # Plota
             plt.plot(range(1, len(res['Mean_Curve'])+1), res['Mean_Curve'], linestyle='--', label=f"{name} BASE (AUC={res['Mean_AUC']:.3f})")
     
     for name, res in results_estendida.items():
+        # Armazena para CSV
+        loss_curves_data.append({
+            'Abordagem': f"{name} (ESTENDIDA)",
+            'AUC': res['Mean_AUC'],
+            **{f't={i+1}': val for i, val in enumerate(res['Mean_Curve'])}
+        })
+        # Plota
         plt.plot(range(1, len(res['Mean_Curve'])+1), res['Mean_Curve'], label=f"{name} EST (AUC={res['Mean_AUC']:.3f})")
         
+    # Salva em disco
+    df_loss_curves = pd.DataFrame(loss_curves_data)
+    df_loss_curves.to_csv(data_processed_dir / 'loss_curves_data.csv', index=False)
+    print(f"Dados numéricos das Curvas de Perda salvos em: {data_processed_dir / 'loss_curves_data.csv'}")
+
     plt.xlabel('Número de testes (t)')
     plt.ylabel('Perda Média')
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
