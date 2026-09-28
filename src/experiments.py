@@ -93,7 +93,15 @@ def leave_one_dataset_out_evaluation(X, P, R, models_dict):
             pred_rank = model.predict(X_test)[0]
             
             # Métrica 1: Correlação de Spearman entre rank predito e rank real
-            srcc, _ = spearmanr(pred_rank, test_R_row)
+            import warnings
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                srcc, _ = spearmanr(pred_rank, test_R_row)
+                
+            # Se o modelo prever o mesmo valor para todos os algoritmos, a correlação é indefinida (NaN)
+            if np.isnan(srcc):
+                srcc = 0.0
+                
             results_srcc[name].append(srcc)
             
             # Métrica 2: Curva de Perda
@@ -123,6 +131,9 @@ def plot_critical_difference_diagram(results_srcc_dict, alpha=0.05, save_path='c
     
     df_results = pd.DataFrame(results_srcc_dict)
     
+    # Remove qualquer NaN residual que possa quebrar o teste estatístico
+    if df_results.isnull().values.any():
+        df_results = df_results.fillna(0.0)
     # 1. Teste de Friedman (estatística não paramétrica para amostras pareadas)
     from scipy.stats import friedmanchisquare
     stat, p_val = friedmanchisquare(*[df_results[c] for c in df_results.columns])
