@@ -1,32 +1,44 @@
 import time
 import numpy as np
+import pandas as pd
 from pathlib import Path
+from tqdm import tqdm
 from src.features import extract_image_features
 from src.data_loader import build_master_dataframe
 
-print("Carregando imagens para teste de velocidade...")
+print("Carregando base de metadados...")
 df = build_master_dataframe(Path('data/raw'))
 
 if df.empty:
     print('Sem dados encontrados em data/raw')
     exit()
+
+datasets = df['dataset_name'].unique()
+tempos_por_dataset = []
+
+print(f"Iniciando cálculo de custo computacional para {len(datasets)} datasets...")
+print("Isso pode demorar um pouco, pois vai processar a matriz estendida real...\n")
+
+for dataset in tqdm(datasets, desc="Processando Datasets"):
+    df_ds = df[df['dataset_name'] == dataset]
+    paths = df_ds['dist_path'].tolist()
     
-# Pega 100 imagens aleatórias para ter uma média justa
-sample_paths = df['dist_path'].sample(100, random_state=42).tolist()
+    start_ds = time.time()
+    for p in paths:
+        extract_image_features(p)
+    end_ds = time.time()
+    
+    total_time_ds = end_ds - start_ds
+    tempos_por_dataset.append(total_time_ds)
+    # Print para você poder acompanhar o andamento no log do SLURM
+    print(f"Dataset '{dataset}' ({len(paths)} imagens) extraído em: {total_time_ds:.2f} segundos")
 
-times = []
-print("Extraindo features visuais de 100 imagens...")
-for p in sample_paths:
-    t0 = time.time()
-    extract_image_features(p)
-    t1 = time.time()
-    times.append(t1 - t0)
+media_dataset = np.mean(tempos_por_dataset)
+mediana_dataset = np.median(tempos_por_dataset)
 
-mediana_img = np.median(times)
-# Média de imagens por dataset no IQA é por volta de 300 imagens
-tempo_dataset = mediana_img * 300
-
-print("-" * 50)
-print(f"Tempo mediano por imagem: {mediana_img:.4f} segundos")
-print(f"Tempo estimado para 1 dataset (300 imagens): {tempo_dataset:.2f} segundos")
+print("\n" + "-" * 50)
+print("=== RESULTADOS FINAIS DE CUSTO COMPUTACIONAL ===")
+print(f"Tempo MÉDIO gasto por dataset: {media_dataset:.2f} segundos")
+print(f"Tempo MEDIANO gasto por dataset: {mediana_dataset:.2f} segundos")
+print(f"Tempo TOTAL para extrair as meta-features de todos os dados: {sum(tempos_por_dataset):.2f} segundos")
 print("-" * 50)
