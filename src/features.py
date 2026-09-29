@@ -1,3 +1,4 @@
+import time
 import numpy as np
 import pandas as pd
 from skimage.color import rgb2gray
@@ -74,6 +75,7 @@ def build_meta_features_matrix(df_metadata, extended=True):
     x_matrix = []
     
     for dataset in tqdm(datasets, desc=f"Extraindo Meta-features (Extended={extended})"):
+        start_time = time.time()
         df_ds = df_metadata[df_metadata['dataset_name'] == dataset]
         
         ds_features = {
@@ -176,6 +178,8 @@ def build_meta_features_matrix(df_metadata, extended=True):
             else:
                 ds_features['LinearRegressionMAE'] = 0.0
                 
+        end_time = time.time()
+        ds_features['ExtractionTimeSeconds'] = end_time - start_time
         x_matrix.append(ds_features)
         
     return pd.DataFrame(x_matrix)

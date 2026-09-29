@@ -13,6 +13,7 @@ job_output_metalearning.txt
 .Python
 build/
 develop-eggs/
+teste.md
 dist/
 downloads/
 eggs/
