@@ -17,7 +17,6 @@ datasets = df['dataset_name'].unique()
 tempos_por_dataset = []
 
 print(f"Iniciando cálculo de custo computacional para {len(datasets)} datasets...")
-print("Isso pode demorar um pouco, pois vai processar a matriz estendida real...\n")
 
 for dataset in tqdm(datasets, desc="Processando Datasets"):
     df_ds = df[df['dataset_name'] == dataset]
