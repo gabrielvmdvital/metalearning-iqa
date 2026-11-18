@@ -1,3 +1,6 @@
+flaml
+lightgbm
+matplotlib
 numpy
 openpyxl
 pandas
@@ -6,6 +9,8 @@ scikit-image
 scikit-learn
 scikit-posthocs
 scipy
+seaborn
 torch
 torchvision
 tqdm
+xgboost
